@@ -35,6 +35,12 @@ class Radio(private val c: Context){
         }
     }
 
+    fun enable(){
+        if(!this.adapter.isEnabled){
+            this.adapter.enable()
+        }
+    }
+
     private fun compatStart(observable: ObservableEmitter<BluetoothDevice>){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             if(this.scanner == null){

@@ -25,6 +25,7 @@ class Scanner(private val c: Context) {
 
     init {
         this.radio = Radio(c)
+        this.radio!!.enable()
     }
 
 
