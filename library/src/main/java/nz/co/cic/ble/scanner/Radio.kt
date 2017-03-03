@@ -1,8 +1,6 @@
 package nz.co.cic.ble.scanner
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
+import android.bluetooth.*
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -18,7 +16,7 @@ import java.util.jar.Manifest
  * Created by dipshit on 4/03/17.
  */
 
-class Radio(private val c: Context){
+class Radio(private val c: Context) : BluetoothGattCallback(){
 
     private val manager: BluetoothManager
     private val adapter: BluetoothAdapter
@@ -27,15 +25,25 @@ class Radio(private val c: Context){
     private var legacyCallback: BluetoothAdapter.LeScanCallback? = null
     private var scanCallback: ScanCallback? = null
 
+
     init {
         this.adapter = BluetoothAdapter.getDefaultAdapter()
         this.manager = c.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+
     }
 
     fun start(): Observable<BluetoothDevice>? {
         return Observable.create<BluetoothDevice> { subscriber ->
             compatStart(subscriber);
         }
+    }
+
+    fun stop(){
+        compatStop()
+    }
+
+    fun resolve(device: BluetoothDevice){
+        var gatt = device.connectGatt(c, false, this)
     }
 
     fun enable(){
@@ -85,7 +93,10 @@ class Radio(private val c: Context){
         }
     }
 
-    fun stop(){
-        compatStop()
+
+    //Bluetooth Gatt Callbacks
+    override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int){
+        super.onConnectionStateChange(gatt, status, newState)
+
     }
 }

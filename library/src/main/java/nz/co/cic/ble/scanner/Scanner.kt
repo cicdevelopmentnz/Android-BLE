@@ -30,7 +30,6 @@ class Scanner(private val c: Context) {
 
 
     fun start() {
-
         this.radio!!.start()!!.subscribe({
             device ->
 
