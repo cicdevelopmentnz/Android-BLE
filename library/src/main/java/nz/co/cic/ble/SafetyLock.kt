@@ -14,24 +14,24 @@ import io.reactivex.ObservableEmitter
 
 class SafetyLock(private val mActivity: Activity){
 
-    private var requstCode: Int = 1001
+    private var requestCode: Int = 1001
     private var observerLock: ObservableEmitter<Boolean>? = null
 
     init {
 
     }
 
-    fun lock(): Observable<Boolean>? {
-        return Observable.create<Boolean> { subscriber ->
+    fun lock(){
+     //   return Observable.create<Boolean> { subscriber ->
             println("Subscribed")
-            this.observerLock = subscriber
+         //   this.observerLock = subscriber
             if(!checkPermissions()) {
                 println("Requesting permissions")
                 requestPermissions()
             }else{
-                this.observerLock!!.onComplete()
+         //       this.observerLock!!.onComplete()
             }
-        }
+        //}
     }
 
     private fun requestPermissions(){
@@ -44,11 +44,11 @@ class SafetyLock(private val mActivity: Activity){
 
     fun onRequestPermissionsResult(reqCode: Int, permissions: Array<String>, grantResults: Array<Int>){
         when(reqCode){
-            requstCode -> {
+            requestCode -> {
                 if(grantResults.size > 0 && this.observerLock != null){
-                    this.observerLock!!.onComplete()
+     //               this.observerLock!!.onComplete()
                 }else{
-                    this.observerLock!!.onError(Throwable("Permissions not granted"))
+       //             this.observerLock!!.onError(Throwable("Permissions not granted"))
                 }
                 println(grantResults)
             }
