@@ -35,7 +35,7 @@ class SafetyLock(private val mActivity: Activity){
     }
 
     private fun requestPermissions(){
-        ActivityCompat.requestPermissions(mActivity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), requstCode)
+        ActivityCompat.requestPermissions(mActivity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), requestCode)
     }
     private fun checkPermissions(): Boolean {
         print("Checking permissions")
