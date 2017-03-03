@@ -11,3 +11,5 @@
    Scanner.start->Observable
    Scanner.stop
 ```
+
+https://jitpack.io/#cicdevelopmentnz/Android-BLE/-SNAPSHOT
