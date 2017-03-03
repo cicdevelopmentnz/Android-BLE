@@ -25,7 +25,10 @@ class SafetyLock(private val mActivity: Activity){
         return Observable.create<Boolean> { subscriber ->
             this.observerLock = subscriber
             if(!checkPermissions()) {
+                println("Requesting permissions")
                 requestPermissions()
+            }else{
+                this.observerLock!!.onComplete()
             }
         }
     }
@@ -34,6 +37,7 @@ class SafetyLock(private val mActivity: Activity){
         ActivityCompat.requestPermissions(mActivity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), requstCode)
     }
     private fun checkPermissions(): Boolean {
+        print("Checking permissions")
         return(ContextCompat.checkSelfPermission(mActivity.applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(mActivity.applicationContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED);
     }
 
