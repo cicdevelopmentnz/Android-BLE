@@ -23,6 +23,7 @@ class SafetyLock(private val mActivity: Activity){
 
     fun lock(): Observable<Boolean>? {
         return Observable.create<Boolean> { subscriber ->
+            println("Subscribed")
             this.observerLock = subscriber
             if(!checkPermissions()) {
                 println("Requesting permissions")
