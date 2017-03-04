@@ -22,6 +22,7 @@ import org.jdeferred.impl.DeferredObject
 class Scanner(private val c: Context) {
 
     private var radio: Radio? = null
+    private var connected: Boolean = false
 
     init {
         this.radio = Radio(c)
@@ -30,11 +31,7 @@ class Scanner(private val c: Context) {
 
 
     fun start() {
-        this.radio!!.start()!!.subscribe({
-            device ->
-
-            println("We have a new device: " + device.address)
-        })
+        this.radio!!.start()
     }
 
 

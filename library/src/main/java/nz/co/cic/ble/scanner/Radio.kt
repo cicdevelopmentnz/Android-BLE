@@ -26,17 +26,30 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
     private var scanCallback: ScanCallback? = null
 
 
+    var isConnected: Boolean = false
+
     init {
         this.adapter = BluetoothAdapter.getDefaultAdapter()
         this.manager = c.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
     }
 
-    fun start(): Observable<BluetoothDevice>? {
-        return Observable.create<BluetoothDevice> { subscriber ->
-            compatStart(subscriber);
-        }
+    fun start() {
+        this.scanDevices()!!.subscribe({
+            btDevice ->
+
+            println("Discovered: " + btDevice.address)
+            var device : RadioDevice = RadioDevice(c, btDevice)
+
+            if(!isConnected) {
+                isConnected = true
+                device.connect()
+            }
+
+        })
     }
+
+
 
     fun stop(){
         compatStop()
@@ -52,6 +65,12 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
         }
     }
 
+    fun scanDevices() : Observable<BluetoothDevice>?{
+        return Observable.create<BluetoothDevice> {
+            subscriber ->
+            compatStart(subscriber)
+        }
+    }
     private fun compatStart(observable: ObservableEmitter<BluetoothDevice>){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             if(this.scanner == null){
