@@ -12,6 +12,8 @@ import io.reactivex.ObservableEmitter
 data class RadioDevice(private val mContext: Context, private val device: BluetoothDevice) : BluetoothGattCallback(){
 
     var isConnected: Boolean = false
+    var isDiscovering: Boolean = false
+
     var gatt: BluetoothGatt? = null
 
 
@@ -40,38 +42,33 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
         if(newState == BluetoothGatt.STATE_CONNECTED){
             isConnected = true
             this.connectionObserver!!.onNext(true)
-            println("Connected to: " + device.address)
         }else if(newState == BluetoothGatt.STATE_DISCONNECTED){
             isConnected = false
             this.connectionObserver!!.onNext(false)
-            println("Disconnected from: " + device.address)
         }
 
-        /*if(isConnected){
+        if(isConnected && !isDiscovering){
+            isDiscovering = true
             discoverServices().subscribe({
                 service ->
-                {
-                    println("Found a service: " + service.uuid)
-                }
+                println("Found a service: " + service.uuid)
             })
+
             gatt!!.readRemoteRssi()
-        }*/
+        }
+
     }
 
     private fun discoverServices() : Observable<BluetoothGattService>{
-
             return Observable.create<BluetoothGattService> {
-                subscriber -> {
+                subscriber ->
                     this.serviceObserver = subscriber
                     gatt!!.discoverServices()
-                }
             }
-
     }
 
     override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
         super.onServicesDiscovered(gatt, status)
-
         var it = gatt!!.services.iterator()
         while(it.hasNext()){
             var service : BluetoothGattService = it!!.next() as BluetoothGattService

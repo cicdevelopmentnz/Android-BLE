@@ -43,7 +43,6 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
             if(!isConnected){
                 device.connect()!!.subscribe({
                     connectionStatus ->
-                    println("Connection status changed to: " + connectionStatus)
                     isConnected = connectionStatus
                 })
             }
