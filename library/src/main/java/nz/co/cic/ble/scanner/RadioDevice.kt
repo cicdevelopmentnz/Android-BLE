@@ -16,13 +16,18 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
 
     private var serviceObserver : ObservableEmitter<BluetoothGattService>? = null
+    private var connectionObserver : ObservableEmitter<Boolean>? = null
 
     init {
 
     }
 
-    fun connect(){
-        gatt = device.connectGatt(mContext, false, this)
+    fun connect() : Observable<Boolean>? {
+        return Observable.create<Boolean> {
+            subscriber ->
+            this.connectionObserver = subscriber
+            gatt = device.connectGatt(mContext, false, this)
+        }
     }
 
     fun disconnect(){
@@ -31,13 +36,18 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
+
         if(newState == BluetoothGatt.STATE_CONNECTED){
             isConnected = true
+            this.connectionObserver!!.onNext(true)
+            println("Connected to: " + device.address)
         }else if(newState == BluetoothGatt.STATE_DISCONNECTED){
             isConnected = false
+            this.connectionObserver!!.onNext(false)
+            println("Disconnected from: " + device.address)
         }
 
-        if(isConnected){
+        /*if(isConnected){
             discoverServices().subscribe({
                 service ->
                 {
@@ -45,7 +55,7 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
                 }
             })
             gatt!!.readRemoteRssi()
-        }
+        }*/
     }
 
     private fun discoverServices() : Observable<BluetoothGattService>{

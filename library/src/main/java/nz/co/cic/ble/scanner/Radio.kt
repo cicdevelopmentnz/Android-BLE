@@ -10,6 +10,7 @@ import android.os.Build
 import android.support.v4.app.ActivityCompat
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import org.reactivestreams.Subscriber
 import java.util.jar.Manifest
 
 /**
@@ -38,14 +39,14 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
         this.scanDevices()!!.subscribe({
             btDevice ->
 
-            println("Discovered: " + btDevice.address)
-            var device : RadioDevice = RadioDevice(c, btDevice)
-
-            if(!isConnected) {
-                isConnected = true
-                device.connect()
+            var device = RadioDevice(c, btDevice)
+            if(!isConnected){
+                device.connect()!!.subscribe({
+                    connectionStatus ->
+                    println("Connection status changed to: " + connectionStatus)
+                    isConnected = connectionStatus
+                })
             }
-
         })
     }
 
