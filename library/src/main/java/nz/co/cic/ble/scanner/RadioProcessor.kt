@@ -6,12 +6,12 @@ import android.bluetooth.BluetoothGattService
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
-import rx.Observable
-import rx.Subscriber
 
 /**
  * Created by dipshit on 5/03/17.
  */
+
+
 
 class RadioDeviceProcessor(private val mContext: Context, private val dataSubscriber: Subscriber<in JSONObject>): Subscriber<BluetoothDevice>() {
 
@@ -35,6 +35,8 @@ class RadioDeviceProcessor(private val mContext: Context, private val dataSubscr
         request(1)
     }
 
+
+    //TODO make backpressure work in an infinite queue
     override fun onNext(p0: BluetoothDevice?) {
         var device = RadioDevice(mContext, p0!!)
         println("Start out state: " + state)
