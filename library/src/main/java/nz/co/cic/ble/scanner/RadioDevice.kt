@@ -4,6 +4,7 @@ import android.bluetooth.*
 import android.content.Context
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import org.reactivestreams.Subscriber
 
 /**
  * Created by dipshit on 4/03/17.
@@ -11,87 +12,110 @@ import io.reactivex.ObservableEmitter
 
 data class RadioDevice(private val mContext: Context, private val device: BluetoothDevice) : BluetoothGattCallback(){
 
-    var isConnected: Boolean = false
-    var isDiscovering: Boolean = false
+    var isConnected: Boolean? = false
+    var isDiscovering: Boolean? = false
 
-    var gatt: BluetoothGatt? = null
-
-
-    private var serviceObserver : ObservableEmitter<BluetoothGattService>? = null
-    private var connectionObserver : ObservableEmitter<Boolean>? = null
+    private var connectionObserver: ObservableEmitter<Boolean>? = null
+    private var serviceObserver: ObservableEmitter<List<BluetoothGattService>>? = null
+    private var characteristicObserver: ObservableEmitter<String>? = null
 
     init {
 
     }
 
     fun connect() : Observable<Boolean>? {
-        return Observable.create<Boolean> {
+        return Observable.create {
             subscriber ->
             this.connectionObserver = subscriber
-            gatt = device.connectGatt(mContext, false, this)
         }
     }
 
     fun disconnect(){
-        this.gatt?.disconnect()
+
+    }
+
+    private fun discoverServices(gatt: BluetoothGatt): Observable<List<BluetoothGattService>>?{
+        if(this.isConnected!! && !this.isDiscovering!!) {
+            return Observable.create {
+                subscriber ->
+                this.serviceObserver = subscriber
+                this.isDiscovering = gatt.discoverServices()
+            }
+        }
+        return null
     }
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
 
-        if(newState == BluetoothGatt.STATE_CONNECTED){
-            isConnected = true
-            this.connectionObserver!!.onNext(true)
-        }else if(newState == BluetoothGatt.STATE_DISCONNECTED){
-            isConnected = false
-            this.connectionObserver!!.onNext(false)
-        }
+        this.isConnected = parseState(newState)
+        this.connectionObserver!!.onNext(parseState(newState))
 
-        if(isConnected && !isDiscovering){
-            isDiscovering = true
-            discoverServices().subscribe({
-                service ->
-                println("Found a service: " + service.uuid)
+        discoverServices(gatt!!)!!.subscribe({
+            service ->
+
+            var serviceProcessor = RadioServiceProcessor(service)
+            serviceProcessor.queue().subscribe({
+                processService ->
+
+                var characteristicProcessor = RadioCharacteristicProcessor(processService)
+                characteristicProcessor.queue().subscribe({
+                    char ->
+
+                    readCharacteristic(gatt, char).subscribe({
+                        charVal ->
+                        println("Found char value: " + charVal)
+                        characteristicProcessor.next()
+                    })
+                }, {
+                    err ->
+
+                }, {
+                    serviceProcessor.next()
+                })
+            }, {
+
+            }, {
+                println("Processed all services")
             })
 
-            gatt!!.readRemoteRssi()
+        })
+
+    }
+
+    private fun readCharacteristic(gatt: BluetoothGatt, char: BluetoothGattCharacteristic): Observable<String>{
+        return Observable.create {
+            subscriber ->
+            this.characteristicObserver = subscriber
+            gatt.readCharacteristic(char)
         }
-
     }
 
-    private fun discoverServices() : Observable<BluetoothGattService>{
-            return Observable.create<BluetoothGattService> {
-                subscriber ->
-                    this.serviceObserver = subscriber
-                    gatt!!.discoverServices()
-            }
+    private fun parseState(state: Int): Boolean{
+        if(state == BluetoothGatt.STATE_CONNECTED){
+            return true;
+        }else if(state == BluetoothGatt.STATE_DISCONNECTED){
+            return false;
+        }
+        return false;
     }
+
 
     override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
         super.onServicesDiscovered(gatt, status)
-        var it = gatt!!.services.iterator()
-        while(it.hasNext()){
-            var service : BluetoothGattService = it!!.next() as BluetoothGattService
-            this.serviceObserver?.onNext(service)
-        }
 
-        this.serviceObserver?.onComplete()
+        this.serviceObserver!!.onNext(gatt!!.services)
+        this.serviceObserver!!.onComplete()
     }
 
     override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
         super.onCharacteristicRead(gatt, characteristic, status)
+        this.characteristicObserver!!.onNext(String(characteristic!!.value))
+        this.characteristicObserver!!.onComplete()
     }
 
     override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
         super.onReadRemoteRssi(gatt, rssi, status)
-        println("RSSI Update: " + rssi)
     }
 
-    fun equals(device: RadioDevice): Boolean{
-        if(device.device.address.equals(this.device.address)){
-            return true;
-        }else{
-            return false;
-        }
-    }
 }
