@@ -65,7 +65,6 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
                 var characteristicProcessor = RadioCharacteristicProcessor(processService)
                 characteristicProcessor.queue().subscribe({
                     char ->
-                    println("Processing char: " + char.uuid)
                     readCharacteristic(gatt, char).subscribe({
                         charVal ->
                         println("Found char value: " + charVal)
@@ -88,8 +87,11 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
     }
 
     private fun readCharacteristic(gatt: BluetoothGatt, char: BluetoothGattCharacteristic): Observable<String>{
+        println("Processing char: " + char.uuid)
+
         return Observable.create {
             subscriber ->
+            println("Subscribed to reading char")
             this.characteristicObserver = subscriber
             gatt.readCharacteristic(char)
         }
@@ -114,6 +116,7 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
     override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
         super.onCharacteristicRead(gatt, characteristic, status)
+        println("Char read: " + String(characteristic!!.value))
         this.characteristicObserver!!.onNext(String(characteristic!!.value))
         this.characteristicObserver!!.onComplete()
     }
