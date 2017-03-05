@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothGattService
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import org.json.JSONArray
+import org.json.JSONObject
 
 import java.util.ArrayList
 import java.util.HashMap
@@ -35,8 +37,9 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
             val pair = it.next() as Map.Entry<String, String>
             hashedValues!!.put(UUID.nameUUIDFromBytes(pair.key.toString().toByteArray()), pair.value.toString())
         }
-    }
 
+        println("Beacon: " + toJSON().toString())
+    }
 
     val compatService: BluetoothGattService
         get() {
@@ -57,7 +60,7 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
             val it = hashedValues!!.entries.iterator()
             while (it.hasNext()) {
                 val pair = it.next() as Map.Entry<UUID, String>
-                val characteristic = BluetoothGattCharacteristic(UUID.fromString(pair.key.toString()), BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ)
+                val characteristic = BluetoothGattCharacteristic(pair.key, BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ)
                 characteristic.setValue(pair.value.toString().toByteArray())
                 characteristics.add(characteristic)
             }
@@ -65,4 +68,19 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
             return characteristics
         }
 
+    fun toJSON(): JSONObject {
+        var serviceJSON = JSONObject()
+        serviceJSON.put("id", this.uuid.toString())
+
+        var messageArray = JSONArray()
+        compatMessages.forEach {
+            message ->
+
+            var messageObject = JSONObject()
+            messageObject.put("id", message.uuid)
+            messageObject.put("value", String(message.value))
+        }
+        serviceJSON.put("messages", messageArray)
+        return serviceJSON
+    }
 }
