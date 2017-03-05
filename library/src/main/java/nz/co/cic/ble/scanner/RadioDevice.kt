@@ -76,6 +76,7 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
                 }, {
 
                 }, {
+                    characteristicObserver.onComplete()
                     println("Next service")
                     serviceProcessor.next()
                 })
@@ -123,7 +124,6 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
         super.onCharacteristicRead(gatt, characteristic, status)
         println("Char read: " + String(characteristic!!.value))
         this.characteristicObserver!!.onNext(characteristic)
-        this.characteristicObserver!!.onComplete()
     }
 
     override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
