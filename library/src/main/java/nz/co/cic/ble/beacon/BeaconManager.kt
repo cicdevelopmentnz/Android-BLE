@@ -58,6 +58,7 @@ class BeaconManager(private val c: Context) {
 
                 override fun onStartFailure(errorCode: Int) {
                     super.onStartFailure(errorCode)
+                    println("Beacon failed to start reason: " + errorCode)
                     subscriber.onNext(false)
                 }
             }
