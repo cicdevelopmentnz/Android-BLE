@@ -38,6 +38,7 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
     private fun discoverServices(gatt: BluetoothGatt): Observable<List<BluetoothGattService>>?{
         if(this.isConnected!! && !this.isDiscovering!!) {
+            isDiscovering = true
             return Observable.create {
                 subscriber ->
                 this.serviceObserver = subscriber

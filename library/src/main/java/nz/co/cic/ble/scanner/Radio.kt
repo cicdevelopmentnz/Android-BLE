@@ -43,6 +43,7 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
 
             var device = RadioDevice(c, btDevice)
             if(!isConnected){
+                isConnected = true
                 device.connect()!!.subscribe({
                     connectionStatus ->
 
