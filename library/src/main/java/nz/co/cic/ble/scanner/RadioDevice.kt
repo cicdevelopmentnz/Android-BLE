@@ -24,9 +24,11 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
     }
 
     fun connect() : Observable<Boolean>? {
+        println("Connect cmd")
         return Observable.create {
             subscriber ->
             this.connectionObserver = subscriber
+            device.connectGatt(mContext, false, this)
         }
     }
 
