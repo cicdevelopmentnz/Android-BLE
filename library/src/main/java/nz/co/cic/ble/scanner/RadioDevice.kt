@@ -57,11 +57,12 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
             var serviceProcessor = RadioServiceProcessor(service)
             serviceProcessor.queue().subscribe({
                 processService ->
+                println("Processing: " + processService.uuid)
 
                 var characteristicProcessor = RadioCharacteristicProcessor(processService)
                 characteristicProcessor.queue().subscribe({
                     char ->
-
+                    println("Processing char: " + char.uuid)
                     readCharacteristic(gatt, char).subscribe({
                         charVal ->
                         println("Found char value: " + charVal)

@@ -19,6 +19,7 @@ class RadioServiceProcessor(val services: List<BluetoothGattService>){
         return Observable.create {
             subscriber ->
             this.observableEmitter = subscriber
+            next()
         }
     }
 
@@ -46,6 +47,7 @@ class RadioCharacteristicProcessor(val service: BluetoothGattService){
         return Observable.create {
             subscriber ->
             this.observableEmitter = subscriber
+            next()
         }
     }
 

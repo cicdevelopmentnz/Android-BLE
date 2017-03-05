@@ -39,10 +39,14 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
         this.scanDevices()!!.subscribe({
             btDevice ->
 
+            println("Found: " + btDevice.address)
+
             var device = RadioDevice(c, btDevice)
             if(!isConnected){
                 device.connect()!!.subscribe({
                     connectionStatus ->
+
+                    println("Connection status update: Connected-" + connectionStatus)
                     isConnected = connectionStatus
                 })
             }
