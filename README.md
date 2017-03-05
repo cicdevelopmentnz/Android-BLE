@@ -8,7 +8,7 @@
    BeaconManager.stop
 
    Scanner:Context
-   Scanner.start->Observable
+   Scanner.start->Observable<JSONObject>
    Scanner.stop
 ```
 

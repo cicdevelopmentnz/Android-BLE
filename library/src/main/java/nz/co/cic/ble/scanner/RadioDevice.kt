@@ -18,6 +18,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
     private var gatt: BluetoothGatt? = null
 
     private var connectionObserver: Subscriber<in List<RadioService>>? = null
+    private var statusObserver: Subscriber<in Boolean>? = null
     private var serviceObserver: Subscriber<in List<BluetoothGattService>>? = null
     private var characteristicObserver: Subscriber<in BluetoothGattCharacteristic>? = null
 
@@ -34,8 +35,13 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
         }
     }
 
-    fun disconnect(){
-        gatt!!.disconnect()
+    fun disconnect(): Observable<Boolean>?{
+        return Observable.create {
+            subscriber ->
+            this.statusObserver = subscriber
+            gatt!!.disconnect()
+        }
+
     }
 
     private fun discoverServices(gatt: BluetoothGatt): Observable<List<BluetoothGattService>>?{
@@ -54,6 +60,10 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
         super.onConnectionStateChange(gatt, status, newState)
 
         this.isConnected = parseState(newState)
+
+        if(!this.isConnected!!){
+            this.statusObserver!!.onCompleted()
+        }
 
         if(this.isConnected!!) {
             discoverServices(gatt!!)!!.subscribe({

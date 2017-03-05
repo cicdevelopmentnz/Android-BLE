@@ -46,20 +46,6 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
 
     }
 
-    private fun joinToJSON(device: RadioDevice, services : List<RadioService> ) : JSONObject{
-        var obj = JSONObject()
-        obj.put("deviceAddress", device.device.address)
-
-        var messageArr = JSONArray()
-        services.forEach {
-            service ->
-            messageArr.put(service.toJSON())
-        }
-
-        obj.put("messages", messageArr)
-        return obj
-    }
-
     fun stop(){
         compatStop()
     }

@@ -38,10 +38,13 @@ class RadioDeviceProcessor(private val mContext: Context, private val dataSubscr
         device.connect()!!.subscribe({
             services ->
 
-            device.disconnect()
-            dataSubscriber.onNext(joinToJSON(device, services))
+            println("Called back")
+            device.disconnect()!!.subscribe({}, {}, {
+                println("Disconnected")
+                dataSubscriber.onNext(joinToJSON(device, services))
+                request(1)
+            })
 
-            request(1)
         })
 
     }
