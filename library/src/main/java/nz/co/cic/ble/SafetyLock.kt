@@ -5,8 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
+import rx.Subscriber
 
 /**
  * Created by dipshit on 4/03/17.
@@ -15,7 +14,7 @@ import io.reactivex.ObservableEmitter
 class SafetyLock(private val mActivity: Activity){
 
     private var requestCode: Int = 1001
-    private var observerLock: ObservableEmitter<Boolean>? = null
+    private var observerLock: Subscriber<in Boolean>? = null
 
     init {
 
