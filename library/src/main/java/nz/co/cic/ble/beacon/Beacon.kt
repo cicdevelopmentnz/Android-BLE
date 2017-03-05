@@ -29,7 +29,7 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
     }
 
     fun initPrivate() {
-        this.uuid = UUID.fromString(name)
+        this.uuid = UUID.nameUUIDFromBytes(name.toByteArray())
 
         this.hashedValues = HashMap<UUID, String>()
         val it = messages.entries.iterator()
