@@ -8,10 +8,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.app.ActivityCompat
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.FlowableEmitter
 import org.json.JSONArray
 import org.json.JSONObject
-import rx.Observable
-import rx.Subscriber
 import java.util.jar.Manifest
 
 /**
@@ -36,13 +37,13 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
 
     }
 
-    fun start() : Observable<JSONObject> {
-        return Observable.create {
+    fun start() : Flowable<JSONObject> {
+        return Flowable.create({
             subscriber ->
 
             this.scanDevices()!!.subscribe(RadioDeviceProcessor(c, subscriber))
 
-        }
+        }, BackpressureStrategy.BUFFER)
 
     }
 
@@ -60,13 +61,13 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
         }
     }
 
-    fun scanDevices() : Observable<BluetoothDevice>?{
-        return Observable.create<BluetoothDevice> {
+    fun scanDevices() : Flowable<BluetoothDevice>?{
+        return Flowable.create<BluetoothDevice>({
             subscriber ->
             compatStart(subscriber)
-        }
+        }, BackpressureStrategy.BUFFER)
     }
-    private fun compatStart(observable: Subscriber<in BluetoothDevice>){
+    private fun compatStart(observable: FlowableEmitter<BluetoothDevice>){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             if(this.scanner == null){
                 this.scanner = this.adapter.bluetoothLeScanner

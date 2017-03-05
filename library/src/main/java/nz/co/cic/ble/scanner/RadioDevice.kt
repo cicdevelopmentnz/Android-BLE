@@ -2,9 +2,11 @@ package nz.co.cic.ble.scanner
 
 import android.bluetooth.*
 import android.content.Context
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.FlowableEmitter
+import io.reactivex.ObservableEmitter
 
-import rx.Observable
-import rx.Subscriber
 
 /**
  * Created by dipshit on 4/03/17.
@@ -17,29 +19,29 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
 
     private var gatt: BluetoothGatt? = null
 
-    private var connectionObserver: Subscriber<in List<RadioService>>? = null
-    private var statusObserver: Subscriber<in Boolean>? = null
-    private var serviceObserver: Subscriber<in List<BluetoothGattService>>? = null
-    private var characteristicObserver: Subscriber<in BluetoothGattCharacteristic>? = null
+    private var connectionObserver: FlowableEmitter<List<RadioService>>? = null
+    private var statusObserver: FlowableEmitter<Boolean>? = null
+    private var serviceObserver: FlowableEmitter<List<BluetoothGattService>>? = null
+    private var characteristicObserver: FlowableEmitter<BluetoothGattCharacteristic>? = null
 
     init {
 
     }
 
-    fun connect() : Observable<Boolean>?{
+    fun connect() : Flowable<Boolean>?{
         println("CONNECT")
-        return Observable.create {
+        return Flowable.create ({
             subscriber ->
             this.statusObserver = subscriber
             gatt = device.connectGatt(mContext, false, this)
-        }
+        }, BackpressureStrategy.BUFFER)
     }
 
-    fun discover(): Observable<List<RadioService>>?{
-        return Observable.create {
+    fun discover(): Flowable<List<RadioService>>?{
+        return Flowable.create({
             subscriber ->
             this.connectionObserver = subscriber
-        }
+        }, BackpressureStrategy.BUFFER)
     }
 
     fun disconnect(){
@@ -47,14 +49,14 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
         gatt!!.disconnect()
     }
 
-    private fun discoverServices(gatt: BluetoothGatt): Observable<List<BluetoothGattService>>?{
+    private fun discoverServices(gatt: BluetoothGatt): Flowable<List<BluetoothGattService>>?{
         if(this.isConnected!! && !this.isDiscovering!!) {
             isDiscovering = true
-            return Observable.create {
+            return Flowable.create<List<BluetoothGattService>>({
                 subscriber ->
                 this.serviceObserver = subscriber
                 this.isDiscovering = gatt.discoverServices()
-            }
+            }, BackpressureStrategy.BUFFER)
         }
         return null
     }
@@ -93,7 +95,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
                     }, {
 
                     }, {
-                        characteristicObserver!!.onCompleted()
+                        characteristicObserver!!.onComplete()
                         radioServices.add(radioService)
                         serviceProcessor.next()
                     })
@@ -102,7 +104,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
 
                 }, {
                     this.connectionObserver!!.onNext(radioServices.toList())
-                    this.connectionObserver!!.onCompleted()
+                    this.connectionObserver!!.onComplete()
                 })
 
             })
@@ -110,11 +112,11 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
 
     }
 
-    private fun startReadingCharacteristics(): Observable<BluetoothGattCharacteristic> {
-        return Observable.create {
+    private fun startReadingCharacteristics(): Flowable<BluetoothGattCharacteristic> {
+        return Flowable.create ({
             subscriber ->
             this.characteristicObserver = subscriber
-        }
+        }, BackpressureStrategy.BUFFER)
     }
 
     private fun readCharacteristic(gatt: BluetoothGatt, char: BluetoothGattCharacteristic){
@@ -139,7 +141,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
         super.onServicesDiscovered(gatt, status)
 
         this.serviceObserver!!.onNext(gatt!!.services)
-        this.serviceObserver!!.onCompleted()
+        this.serviceObserver!!.onComplete()
     }
 
     override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
