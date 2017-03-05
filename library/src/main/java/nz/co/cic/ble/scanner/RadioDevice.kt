@@ -100,6 +100,9 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
     private fun readCharacteristic(gatt: BluetoothGatt, char: BluetoothGattCharacteristic){
         println("Processing char: " + char.uuid)
+        println("Properties: " + char.properties)
+        println("Permissions: " + char.permissions)
+
         gatt.readCharacteristic(char)
     }
 
