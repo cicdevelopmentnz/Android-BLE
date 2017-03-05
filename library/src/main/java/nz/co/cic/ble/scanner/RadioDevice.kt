@@ -80,7 +80,7 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
                 }, {
                     characteristicObserver!!.onComplete()
-                    println(radioService)
+                    println(radioService.toJSON().toString())
                     serviceProcessor.next()
                 })
 
