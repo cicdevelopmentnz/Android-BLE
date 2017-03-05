@@ -29,11 +29,10 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
     }
 
     fun connect() : Flowable<Boolean>?{
-        println("CONNECT")
         return Flowable.create ({
             subscriber ->
             this.statusObserver = subscriber
-            gatt = device.connectGatt(mContext, false, this)
+            gatt = device.connectGatt(mContext, true, this)
         }, BackpressureStrategy.BUFFER)
     }
 
@@ -45,7 +44,6 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
     }
 
     fun disconnect(){
-        println("DISCONNECT")
         gatt!!.disconnect()
     }
 

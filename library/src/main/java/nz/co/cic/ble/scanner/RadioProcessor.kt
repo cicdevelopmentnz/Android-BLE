@@ -43,10 +43,7 @@ class RadioDeviceProcessor(private val mContext: Context, private val emitter: F
             state ->
 
             if(!state){
-                println("Disconnected")
                 request(1)
-            }else{
-                println("Connected")
             }
         })
     }

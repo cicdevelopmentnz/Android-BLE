@@ -17,7 +17,7 @@ import java.util.ArrayList
  */
 
 class BeaconBackend(private val mContext: Context, bluetoothManager: BluetoothManager) : BluetoothGattServerCallback() {
-/*    var server: BluetoothGattServer
+    var server: BluetoothGattServer
     var beaconList: MutableList<Beacon>
 
     init {
@@ -71,4 +71,4 @@ class BeaconBackend(private val mContext: Context, bluetoothManager: BluetoothMa
     override fun onMtuChanged(device: BluetoothDevice, mtu: Int) {
         super.onMtuChanged(device, mtu)
     }
-*/}
+}

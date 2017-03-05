@@ -8,6 +8,7 @@ import android.content.Intent
 
 import java.util.ArrayList
 import java.util.HashMap
+import java.util.Map
 import java.util.UUID
 
 /**
@@ -16,7 +17,7 @@ import java.util.UUID
 
 class Beacon(var name: String, var messages: HashMap<String, String>) {
 
-  /*  private var uuid: UUID? = null
+    private var uuid: UUID? = null
     private var hashedValues: HashMap<UUID, String>? = null
 
     init {
@@ -31,8 +32,8 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
         this.hashedValues = HashMap<UUID, String>()
         val it = messages.entries.iterator()
         while (it.hasNext()) {
-            val pair = it.next() as Entry<*, *>
-            hashedValues!!.put(UUID.fromString(pair.key.toString()), pair.value.toString())
+            val pair = it.next() as Map.Entry<String, String>
+            hashedValues!!.put(UUID.nameUUIDFromBytes(pair.key.toString().toByteArray()), pair.value.toString())
         }
     }
 
@@ -55,7 +56,7 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
 
             val it = hashedValues!!.entries.iterator()
             while (it.hasNext()) {
-                val pair = it.next() as Entry<*, *>
+                val pair = it.next() as Map.Entry<UUID, String>
                 val characteristic = BluetoothGattCharacteristic(UUID.fromString(pair.key.toString()), BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ)
                 characteristic.setValue(pair.value.toString().toByteArray())
                 characteristics.add(characteristic)
@@ -63,6 +64,5 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
 
             return characteristics
         }
-*/
 
 }

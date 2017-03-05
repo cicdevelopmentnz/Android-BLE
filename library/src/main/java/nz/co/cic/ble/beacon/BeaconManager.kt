@@ -7,6 +7,8 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.content.Context
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
 
 import org.jdeferred.Deferred
 
@@ -16,7 +18,7 @@ import org.jdeferred.Deferred
 
 class BeaconManager(private val c: Context) {
 
-  /*  private val manager: BluetoothManager
+    private val manager: BluetoothManager
     private val adapter: BluetoothAdapter
     private var advertiser: BluetoothLeAdvertiser? = null
 
@@ -41,30 +43,32 @@ class BeaconManager(private val c: Context) {
         this.backend.removeBeacon(b)
     }
 
-    fun start(deferred: Deferred<*, *, *>) {
+    fun start(): Flowable<Boolean>{
         if (this.advertiser == null) {
             this.advertiser = getAdvertiser()
         }
 
-        this.advertiseCallback = object : AdvertiseCallback() {
-            override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
-                super.onStartSuccess(settingsInEffect)
-                deferred.resolve(settingsInEffect)
+        return Flowable.create({
+            subscriber ->
+            this.advertiseCallback = object : AdvertiseCallback() {
+                override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
+                    super.onStartSuccess(settingsInEffect)
+                    subscriber.onNext(true)
+                }
+
+                override fun onStartFailure(errorCode: Int) {
+                    super.onStartFailure(errorCode)
+                    subscriber.onNext(false)
+                }
             }
 
-            override fun onStartFailure(errorCode: Int) {
-                super.onStartFailure(errorCode)
-                deferred.reject(errorCode)
-            }
-        }
-
-        this.advertiser!!.startAdvertising(voidSettings(), voidData(), this.advertiseCallback)
+            this.advertiser!!.startAdvertising(voidSettings(), voidData(), this.advertiseCallback)
+        }, BackpressureStrategy.BUFFER)
     }
 
-    fun stop(deferred: Deferred<*, *, *>) {
+    fun stop() {
         if (this.advertiser != null) {
             this.advertiser!!.stopAdvertising(advertiseCallback)
-            deferred.resolve(null)
         }
     }
 
@@ -80,5 +84,4 @@ class BeaconManager(private val c: Context) {
         return AdvertiseData.Builder().setIncludeDeviceName(true).build()
     }
 
-*/
 }
