@@ -31,12 +31,9 @@ class Scanner(private val c: Context) {
         this.radio!!.enable()
     }
 
-
     fun start(): Observable<JSONObject>{
         return this.radio!!.start()
     }
-
-
 
     fun stop() {
         if(this.radio != null){

@@ -8,11 +8,10 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.app.ActivityCompat
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
 import org.json.JSONArray
 import org.json.JSONObject
-import org.reactivestreams.Subscriber
+import rx.Observable
+import rx.Subscriber
 import java.util.jar.Manifest
 
 /**
@@ -37,27 +36,12 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
 
     }
 
-    fun start() : Observable<JSONObject>{
-        return Observable.create{
+    fun start() : Observable<JSONObject> {
+        return Observable.create {
             subscriber ->
 
-            this.scanDevices()!!.subscribe({
-                btDevice ->
+            this.scanDevices()!!.subscribe(RadioDeviceProcessor(c, subscriber))
 
-                var device = RadioDevice(c, btDevice)
-                if(!isConnected){
-                    isConnected = true
-                    device.connect()!!.subscribe({
-                        services ->
-
-                        device.disconnect()
-                        isConnected = false
-
-                        subscriber.onNext(joinToJSON(device, services))
-
-                    })
-                }
-            })
         }
 
     }
@@ -75,8 +59,6 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
         obj.put("messages", messageArr)
         return obj
     }
-
-
 
     fun stop(){
         compatStop()
@@ -98,7 +80,7 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
             compatStart(subscriber)
         }
     }
-    private fun compatStart(observable: ObservableEmitter<BluetoothDevice>){
+    private fun compatStart(observable: Subscriber<in BluetoothDevice>){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             if(this.scanner == null){
                 this.scanner = this.adapter.bluetoothLeScanner

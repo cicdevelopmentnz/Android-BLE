@@ -2,9 +2,9 @@ package nz.co.cic.ble.scanner
 
 import android.bluetooth.*
 import android.content.Context
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import org.reactivestreams.Subscriber
+
+import rx.Observable
+import rx.Subscriber
 
 /**
  * Created by dipshit on 4/03/17.
@@ -17,9 +17,9 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
 
     private var gatt: BluetoothGatt? = null
 
-    private var connectionObserver: ObservableEmitter<List<RadioService>>? = null
-    private var serviceObserver: ObservableEmitter<List<BluetoothGattService>>? = null
-    private var characteristicObserver: ObservableEmitter<BluetoothGattCharacteristic>? = null
+    private var connectionObserver: Subscriber<in List<RadioService>>? = null
+    private var serviceObserver: Subscriber<in List<BluetoothGattService>>? = null
+    private var characteristicObserver: Subscriber<in BluetoothGattCharacteristic>? = null
 
     init {
 
@@ -83,7 +83,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
                     }, {
 
                     }, {
-                        characteristicObserver!!.onComplete()
+                        characteristicObserver!!.onCompleted()
                         radioServices.add(radioService)
                         serviceProcessor.next()
                     })
@@ -92,7 +92,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
 
                 }, {
                     this.connectionObserver!!.onNext(radioServices.toList())
-                    this.connectionObserver!!.onComplete()
+                    this.connectionObserver!!.onCompleted()
                 })
 
             })
@@ -129,7 +129,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
         super.onServicesDiscovered(gatt, status)
 
         this.serviceObserver!!.onNext(gatt!!.services)
-        this.serviceObserver!!.onComplete()
+        this.serviceObserver!!.onCompleted()
     }
 
     override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {

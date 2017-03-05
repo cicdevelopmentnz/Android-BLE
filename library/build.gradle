@@ -26,8 +26,8 @@ android {
 dependencies {
     // add dependencies here
     compile 'org.jdeferred:jdeferred-android:1.2.5'
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.0.1'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.2.7'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     compile 'com.android.support:support-v4:25.1.1'
     compile 'com.karumi:dexter:3.0.2'
