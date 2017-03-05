@@ -103,6 +103,14 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
         println("Properties: " + char.properties)
         println("Permissions: " + char.permissions)
 
+        if(char.properties.and(BluetoothGattCharacteristic.PROPERTY_READ) == BluetoothGattCharacteristic.PROPERTY_READ){
+            println("I can read :o")
+        }
+
+        if(char.permissions.and(BluetoothGattCharacteristic.PERMISSION_READ) == BluetoothGattCharacteristic.PERMISSION_READ){
+            println("I have permission too :oooooo")
+        }
+
         gatt.readCharacteristic(char)
     }
 
