@@ -26,22 +26,25 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
 
     }
 
-    fun connect() : Observable<List<RadioService>>? {
+    fun connect() : Observable<Boolean>?{
+        println("CONNECT")
         return Observable.create {
             subscriber ->
-            this.connectionObserver = subscriber
-
+            this.statusObserver = subscriber
             gatt = device.connectGatt(mContext, false, this)
         }
     }
 
-    fun disconnect(): Observable<Boolean>?{
+    fun discover(): Observable<List<RadioService>>?{
         return Observable.create {
             subscriber ->
-            this.statusObserver = subscriber
-            gatt!!.disconnect()
+            this.connectionObserver = subscriber
         }
+    }
 
+    fun disconnect(){
+        println("DISCONNECT")
+        gatt!!.disconnect()
     }
 
     private fun discoverServices(gatt: BluetoothGatt): Observable<List<BluetoothGattService>>?{
@@ -60,10 +63,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
         super.onConnectionStateChange(gatt, status, newState)
 
         this.isConnected = parseState(newState)
-
-        if(!this.isConnected!!){
-            this.statusObserver!!.onCompleted()
-        }
+        this.statusObserver!!.onNext(parseState(newState))
 
         if(this.isConnected!!) {
             discoverServices(gatt!!)!!.subscribe({

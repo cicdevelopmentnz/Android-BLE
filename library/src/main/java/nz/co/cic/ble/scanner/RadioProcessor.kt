@@ -15,6 +15,8 @@ import rx.Subscriber
 
 class RadioDeviceProcessor(private val mContext: Context, private val dataSubscriber: Subscriber<in JSONObject>): Subscriber<BluetoothDevice>() {
 
+    private var state : Boolean? = false
+
     private fun joinToJSON(device: RadioDevice, services : List<RadioService> ) : JSONObject{
         var obj = JSONObject()
         obj.put("deviceAddress", device.device.address)
@@ -35,16 +37,25 @@ class RadioDeviceProcessor(private val mContext: Context, private val dataSubscr
 
     override fun onNext(p0: BluetoothDevice?) {
         var device = RadioDevice(mContext, p0!!)
-        device.connect()!!.subscribe({
+        println("Start out state: " + state)
+
+        state = true
+        device.discover()!!.subscribe({
             services ->
-
-            println("Called back")
-            device.disconnect()!!.subscribe({}, {}, {
-                println("Disconnected")
+                println("Called back")
                 dataSubscriber.onNext(joinToJSON(device, services))
-                request(1)
-            })
+                device.disconnect()
+        })
 
+        device.connect()!!.subscribe({
+            status ->
+            if(status){
+                println("Connected")
+            }else{
+                println("Disconnected")
+                state = false
+                request(1)
+            }
         })
 
     }
