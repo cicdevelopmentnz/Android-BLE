@@ -29,7 +29,7 @@ data class RadioMessage(val characteristic: BluetoothGattCharacteristic){
 
     init{
         this.messageId = characteristic.uuid.toString()
-        if(characteristic.value.isNotEmpty()) {
+        if(characteristic.value != null) {
             this.message = String(characteristic.value)
         }
     }
