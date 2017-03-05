@@ -15,7 +15,9 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
     var isConnected: Boolean? = false
     var isDiscovering: Boolean? = false
 
-    private var connectionObserver: ObservableEmitter<Boolean>? = null
+    private var gatt: BluetoothGatt? = null
+
+    private var connectionObserver: ObservableEmitter<List<RadioService>>? = null
     private var serviceObserver: ObservableEmitter<List<BluetoothGattService>>? = null
     private var characteristicObserver: ObservableEmitter<BluetoothGattCharacteristic>? = null
 
@@ -23,17 +25,17 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
     }
 
-    fun connect() : Observable<Boolean>? {
-        println("Connect cmd")
+    fun connect() : Observable<List<RadioService>>? {
         return Observable.create {
             subscriber ->
             this.connectionObserver = subscriber
-            device.connectGatt(mContext, false, this)
+
+            gatt = device.connectGatt(mContext, false, this)
         }
     }
 
     fun disconnect(){
-
+        gatt!!.disconnect()
     }
 
     private fun discoverServices(gatt: BluetoothGatt): Observable<List<BluetoothGattService>>?{
@@ -52,12 +54,13 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
         super.onConnectionStateChange(gatt, status, newState)
 
         this.isConnected = parseState(newState)
-        this.connectionObserver!!.onNext(parseState(newState))
 
         discoverServices(gatt!!)!!.subscribe({
-            service ->
+            services ->
 
-            var serviceProcessor = RadioServiceProcessor(service)
+            var serviceProcessor = RadioServiceProcessor(services)
+            var radioServices = mutableListOf<RadioService>()
+
             serviceProcessor.queue().subscribe({
                 processService ->
 
@@ -80,14 +83,15 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
                 }, {
                     characteristicObserver!!.onComplete()
-                    println(radioService.toJSON().toString())
+                    radioServices.add(radioService)
                     serviceProcessor.next()
                 })
+            }, {
+                err ->
 
             }, {
-
-            }, {
-                println("Processed all services")
+                this.connectionObserver!!.onNext(radioServices.toList())
+                this.connectionObserver!!.onComplete()
             })
 
         })

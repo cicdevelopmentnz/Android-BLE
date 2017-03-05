@@ -25,7 +25,7 @@ data class RadioService(val service: BluetoothGattService){
 
     fun toJSON(): JSONObject{
         var serviceObject =JSONObject()
-        serviceObject.put("serviceId", serviceId)
+        serviceObject.put("id", serviceId)
 
         var messageObject = JSONArray()
         messages!!.forEach {
@@ -53,7 +53,7 @@ data class RadioMessage(val characteristic: BluetoothGattCharacteristic){
     fun toJSON(): JSONObject{
         var messageObject = JSONObject()
         messageObject.put("id", messageId)
-        messageObject.put("val", message)
+        messageObject.put("value", message)
         return messageObject
     }
 }
