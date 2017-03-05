@@ -10,6 +10,8 @@ import android.os.Build
 import android.support.v4.app.ActivityCompat
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import org.json.JSONArray
+import org.json.JSONObject
 import org.reactivestreams.Subscriber
 import java.util.jar.Manifest
 
@@ -35,25 +37,43 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
 
     }
 
-    fun start() {
-        this.scanDevices()!!.subscribe({
-            btDevice ->
+    fun start() : Observable<JSONObject>{
+        return Observable.create{
+            subscriber ->
 
-            var device = RadioDevice(c, btDevice)
-            if(!isConnected){
-                isConnected = true
-                device.connect()!!.subscribe({
-                    services ->
+            this.scanDevices()!!.subscribe({
+                btDevice ->
 
-                    device.disconnect()
-                    isConnected = false
-                    services.forEach {
-                        service ->
-                        println("JSON Rep: " + service.toJSON().toString())
-                    }
-                })
-            }
-        })
+                var device = RadioDevice(c, btDevice)
+                if(!isConnected){
+                    isConnected = true
+                    device.connect()!!.subscribe({
+                        services ->
+
+                        device.disconnect()
+                        isConnected = false
+
+                        subscriber.onNext(joinToJSON(device, services))
+
+                    })
+                }
+            })
+        }
+
+    }
+
+    private fun joinToJSON(device: RadioDevice, services : List<RadioService> ) : JSONObject{
+        var obj = JSONObject()
+        obj.put("deviceAddress", device.device.address)
+
+        var messageArr = JSONArray()
+        services.forEach {
+            service ->
+            messageArr.put(service.toJSON())
+        }
+
+        obj.put("messages", messageArr)
+        return obj
     }
 
 

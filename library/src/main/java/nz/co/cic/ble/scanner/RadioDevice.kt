@@ -10,7 +10,7 @@ import org.reactivestreams.Subscriber
  * Created by dipshit on 4/03/17.
  */
 
-data class RadioDevice(private val mContext: Context, private val device: BluetoothDevice) : BluetoothGattCallback(){
+data class RadioDevice(private val mContext: Context, val device: BluetoothDevice) : BluetoothGattCallback(){
 
     var isConnected: Boolean? = false
     var isDiscovering: Boolean? = false
@@ -55,46 +55,48 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
         this.isConnected = parseState(newState)
 
-        discoverServices(gatt!!)!!.subscribe({
-            services ->
+        if(this.isConnected!!) {
+            discoverServices(gatt!!)!!.subscribe({
+                services ->
 
-            var serviceProcessor = RadioServiceProcessor(services)
-            var radioServices = mutableListOf<RadioService>()
+                var serviceProcessor = RadioServiceProcessor(services)
+                var radioServices = mutableListOf<RadioService>()
 
-            serviceProcessor.queue().subscribe({
-                processService ->
+                serviceProcessor.queue().subscribe({
+                    processService ->
 
-                var radioService = RadioService(processService)
+                    var radioService = RadioService(processService)
 
-                var characteristicProcessor = RadioCharacteristicProcessor(processService)
+                    var characteristicProcessor = RadioCharacteristicProcessor(processService)
 
-                startReadingCharacteristics().subscribe({
-                    characteristic ->
+                    startReadingCharacteristics().subscribe({
+                        characteristic ->
 
-                    radioService.addMessage(characteristic)
+                        radioService.addMessage(characteristic)
 
-                    characteristicProcessor.next()
+                        characteristicProcessor.next()
+                    })
+
+                    characteristicProcessor.queue().subscribe({
+                        char ->
+                        readCharacteristic(gatt, char)
+                    }, {
+
+                    }, {
+                        characteristicObserver!!.onComplete()
+                        radioServices.add(radioService)
+                        serviceProcessor.next()
+                    })
+                }, {
+                    err ->
+
+                }, {
+                    this.connectionObserver!!.onNext(radioServices.toList())
+                    this.connectionObserver!!.onComplete()
                 })
 
-                characteristicProcessor.queue().subscribe({
-                    char ->
-                    readCharacteristic(gatt, char)
-                }, {
-
-                }, {
-                    characteristicObserver!!.onComplete()
-                    radioServices.add(radioService)
-                    serviceProcessor.next()
-                })
-            }, {
-                err ->
-
-            }, {
-                this.connectionObserver!!.onNext(radioServices.toList())
-                this.connectionObserver!!.onComplete()
             })
-
-        })
+        }
 
     }
 

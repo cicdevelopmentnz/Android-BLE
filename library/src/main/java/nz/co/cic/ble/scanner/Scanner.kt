@@ -9,11 +9,13 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.os.Build
 import android.widget.Toast
+import io.reactivex.Observable
 
 import org.jdeferred.Deferred
 import org.jdeferred.FailCallback
 import org.jdeferred.Promise
 import org.jdeferred.impl.DeferredObject
+import org.json.JSONObject
 
 /**
  * Created by dipshit on 3/03/17.
@@ -30,8 +32,8 @@ class Scanner(private val c: Context) {
     }
 
 
-    fun start() {
-        this.radio!!.start()
+    fun start(): Observable<JSONObject>{
+        return this.radio!!.start()
     }
 
 
