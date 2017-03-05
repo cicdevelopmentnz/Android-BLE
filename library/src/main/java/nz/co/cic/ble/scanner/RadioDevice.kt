@@ -60,13 +60,16 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
             var serviceProcessor = RadioServiceProcessor(service)
             serviceProcessor.queue().subscribe({
                 processService ->
-                println("Processing: " + processService.uuid)
+
+                var radioService = RadioService(processService)
 
                 var characteristicProcessor = RadioCharacteristicProcessor(processService)
 
                 startReadingCharacteristics().subscribe({
                     characteristic ->
-                    println("Resolved char: " + String(characteristic.value))
+
+                    radioService.addMessage(characteristic)
+
                     characteristicProcessor.next()
                 })
 
@@ -77,7 +80,7 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
                 }, {
                     characteristicObserver!!.onComplete()
-                    println("Next service")
+                    println(radioService)
                     serviceProcessor.next()
                 })
 
@@ -99,19 +102,11 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
     }
 
     private fun readCharacteristic(gatt: BluetoothGatt, char: BluetoothGattCharacteristic){
-        println("Processing char: " + char.uuid)
-        println("Properties: " + char.properties)
-        println("Permissions: " + char.permissions)
-
         if(char.properties.and(BluetoothGattCharacteristic.PROPERTY_READ) == BluetoothGattCharacteristic.PROPERTY_READ){
-            println("I can read :o")
+            gatt.readCharacteristic(char)
+        }else{
+            characteristicObserver!!.onNext(char)
         }
-
-        if(char.permissions.and(BluetoothGattCharacteristic.PERMISSION_READ) == BluetoothGattCharacteristic.PERMISSION_READ){
-            println("I have permission too :oooooo")
-        }
-
-        gatt.readCharacteristic(char)
     }
 
     private fun parseState(state: Int): Boolean{
@@ -133,7 +128,6 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
 
     override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
         super.onCharacteristicRead(gatt, characteristic, status)
-        println("Char read: " + String(characteristic!!.value))
         this.characteristicObserver!!.onNext(characteristic)
     }
 
