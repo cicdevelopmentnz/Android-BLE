@@ -76,7 +76,7 @@ data class RadioDevice(private val mContext: Context, private val device: Blueto
                 }, {
 
                 }, {
-                    characteristicObserver.onComplete()
+                    characteristicObserver!!.onComplete()
                     println("Next service")
                     serviceProcessor.next()
                 })
