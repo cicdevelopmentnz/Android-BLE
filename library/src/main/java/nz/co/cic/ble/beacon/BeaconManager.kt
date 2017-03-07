@@ -12,6 +12,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 
 import org.jdeferred.Deferred
+import java.nio.charset.Charset
 import java.util.*
 
 /**

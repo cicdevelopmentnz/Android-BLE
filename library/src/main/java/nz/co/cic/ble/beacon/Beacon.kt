@@ -37,7 +37,7 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
         while (it.hasNext()) {
             val pair = it.next() as Map.Entry<String, String>
             hashedValues!!.put(UUID.nameUUIDFromBytes(pair.key.toString().toByteArray()), pair.value.toString())
-            println("UUID: " + pair.key.toString() + " Val: " + pair.value.toString())
+            println("UUID: " + pair.key.toString() + " Val: " + pair.value.toString().toByteArray().size)
         }
 
         println("Beacon: " + toJSON().toString())
