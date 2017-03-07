@@ -7,10 +7,12 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.content.Context
+import android.os.ParcelUuid
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 
 import org.jdeferred.Deferred
+import java.util.*
 
 /**
  * Created by dipshit on 3/03/17.
@@ -83,7 +85,10 @@ class BeaconManager(private val c: Context) {
     }
 
     private fun voidData(): AdvertiseData {
-        return AdvertiseData.Builder().setIncludeDeviceName(true).build()
+        return AdvertiseData.Builder()
+                .addServiceUuid(ParcelUuid(UUID.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63")))
+                .addServiceData(ParcelUuid(UUID.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63")), "Filler".toByteArray())
+                .setIncludeDeviceName(true).build()
     }
 
 }
