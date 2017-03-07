@@ -81,6 +81,8 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
             var messageObject = JSONObject()
             messageObject.put("id", message.uuid)
             messageObject.put("value", String(message.value))
+
+            messageArray.put(messageObject)
         }
         serviceJSON.put("messages", messageArray)
         return serviceJSON
