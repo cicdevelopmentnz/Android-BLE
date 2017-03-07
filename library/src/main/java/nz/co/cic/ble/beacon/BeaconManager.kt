@@ -46,6 +46,7 @@ class BeaconManager(private val c: Context) {
     fun start(): Flowable<Boolean>{
         if (this.advertiser == null) {
             this.advertiser = getAdvertiser()
+            println("Supports advertising: " + this.adapter.isMultipleAdvertisementSupported)
         }
 
         return Flowable.create({
