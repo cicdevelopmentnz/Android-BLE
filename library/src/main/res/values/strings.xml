@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">ExampleLib</string>
+    <string name="app_name">BLE</string>
+    <string name="ad_key">A9BE7B17-05DA-4FB1-97DF-2E07FFE687FE</string>
 </resources>

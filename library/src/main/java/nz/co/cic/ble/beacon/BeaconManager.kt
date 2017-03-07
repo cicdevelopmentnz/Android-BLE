@@ -10,7 +10,7 @@ import android.content.Context
 import android.os.ParcelUuid
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-
+import nz.co.cic.ble.R
 import org.jdeferred.Deferred
 import java.nio.charset.Charset
 import java.util.*
@@ -47,28 +47,27 @@ class BeaconManager(private val c: Context) {
     }
 
     fun start(): Flowable<Boolean>{
-        if (this.advertiser == null) {
-            this.advertiser = getAdvertiser()
-            println("Supports advertising: " + this.adapter.isMultipleAdvertisementSupported)
-        }
 
-        return Flowable.create({
-            subscriber ->
-            this.advertiseCallback = object : AdvertiseCallback() {
-                override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
-                    super.onStartSuccess(settingsInEffect)
-                    subscriber.onNext(true)
-                }
-
-                override fun onStartFailure(errorCode: Int) {
-                    super.onStartFailure(errorCode)
-                    println("Beacon failed to start reason: " + errorCode)
-                    subscriber.onNext(false)
-                }
+            if (this.advertiser == null) {
+                this.advertiser = getAdvertiser()
+                println("Supports advertising: " + this.adapter.isMultipleAdvertisementSupported)
             }
 
-            this.advertiser!!.startAdvertising(voidSettings(), voidData(), this.advertiseCallback)
-        }, BackpressureStrategy.BUFFER)
+            return Flowable.create({
+                subscriber ->
+                this.advertiseCallback = object : AdvertiseCallback() {
+                    override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
+                        super.onStartSuccess(settingsInEffect)
+                        subscriber.onNext(true)
+                    }
+
+                    override fun onStartFailure(errorCode: Int) {
+                        super.onStartFailure(errorCode)
+                        subscriber.onNext(false)
+                    }
+                }
+                this.advertiser!!.startAdvertising(voidSettings(), voidData(), this.advertiseCallback)
+            }, BackpressureStrategy.BUFFER)
     }
 
     fun stop() {
@@ -82,14 +81,14 @@ class BeaconManager(private val c: Context) {
     }
 
     private fun voidSettings(): AdvertiseSettings {
-        return AdvertiseSettings.Builder().setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER).setConnectable(true).build()
+        return AdvertiseSettings.Builder().setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED).setConnectable(true).setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM).build()
     }
 
     private fun voidData(): AdvertiseData {
         return AdvertiseData.Builder()
-                .addServiceUuid(ParcelUuid(UUID.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63")))
-                .addServiceData(ParcelUuid(UUID.fromString("CDB7950D-73F1-4D4D-8E47-C090502DBD63")), "Filler".toByteArray())
-                .setIncludeDeviceName(true).build()
+                .addServiceUuid(ParcelUuid(UUID.fromString(c.getString(R.string.ad_key))))
+                .addServiceData(ParcelUuid(UUID.fromString(c.getString(R.string.ad_key))), "shouldertap".toByteArray())
+                .build()
     }
 
 }
