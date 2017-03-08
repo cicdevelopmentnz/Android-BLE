@@ -32,7 +32,7 @@ data class RadioDevice(private val mContext: Context, val device: BluetoothDevic
         return Flowable.create ({
             subscriber ->
             this.statusObserver = subscriber
-            gatt = device.connectGatt(mContext, true, this)
+            gatt = device.connectGatt(mContext, false, this)
         }, BackpressureStrategy.BUFFER)
     }
 

@@ -33,14 +33,10 @@ class Beacon(var name: String, var messages: HashMap<String, String>) {
 
         this.hashedValues = HashMap<UUID, String>()
         val it = messages.entries.iterator()
-        println("Message count: " + messages.size)
         while (it.hasNext()) {
             val pair = it.next() as Map.Entry<String, String>
             hashedValues!!.put(UUID.nameUUIDFromBytes(pair.key.toString().toByteArray()), pair.value.toString())
-            println("UUID: " + pair.key.toString() + " Val: " + pair.value.toString().toByteArray().size)
         }
-
-        println("Beacon: " + toJSON().toString())
     }
 
     val compatService: BluetoothGattService
