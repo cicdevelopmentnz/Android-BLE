@@ -34,4 +34,22 @@
    ); 
 ```
 
-https://jitpack.io/#cicdevelopmentnz/Android-BLE
+## Installation
+
+Add the following to your root build.gradle
+
+```gradle
+   allprojects {
+      repositories {
+         ...
+         maven { url 'https://jitpack.io' }
+      }
+   }
+```
+
+Add the dependency
+```gradle
+   dependencies {
+      compile 'com.github.cicdevelopmentnz:Android-BLE:v0.0.2'
+   }
+```
