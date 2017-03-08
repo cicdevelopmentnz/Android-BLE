@@ -88,7 +88,7 @@ class BeaconManager(private val c: Context) {
     private fun voidData(): AdvertiseData {
         return AdvertiseData.Builder()
                 .addServiceUuid(ParcelUuid(UUID.fromString(c.getString(R.string.ad_key))))
-                .addServiceData(ParcelUuid(UUID.fromString(c.getString(R.string.ad_key))), "shouldertap".toByteArray())
+                .addServiceData(ParcelUuid(UUID.fromString(c.getString(R.string.ad_key))), "node".toByteArray())
                 .build()
     }
 
