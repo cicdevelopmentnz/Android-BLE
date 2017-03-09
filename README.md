@@ -16,7 +16,7 @@ Add the following to your root build.gradle
 Add the dependency
 ```gradle
    dependencies {
-      compile 'com.github.cicdevelopmentnz:Android-BLE:v0.0.2'
+      compile 'com.github.cicdevelopmentnz:Android-BLE:v0.0.3'
    }
 ```
 
@@ -39,7 +39,7 @@ Add the dependency
 
 ```
 
-### Beacon
+### Beacon (Peripheral/Advertiser)
 
 ```java
    HashMap messages = new HashMap<String, String>();
@@ -60,7 +60,7 @@ Add the dependency
    );
 ```
 
-### Scanner
+### Scanner (Central/Discovery)
 
 ```java
 
