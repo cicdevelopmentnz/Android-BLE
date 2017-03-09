@@ -41,17 +41,30 @@ Add the dependency
 
 ### Beacon (Peripheral/Advertiser)
 
+#### Data container
+
+with Map
+
 ```java
    HashMap messages = new HashMap<String, String>();
    messages.put("Gateway-Id", "UxayxL");
-   messages.put("Gateway-Key", "UDP-123");
-   
+   messages.put("Gateway-Key", "UDP-123");   
    Beacon beacon = new Beacon("Gateway-Node", messages);
+```
+with Json
 
+```java
+   String jsonString = "...example advertisement...";
+   Beacon beacon = new Beacon(jsonString);
+```
+
+#### Beacon Manager
+
+```java
    BeaconManager beaconManager = new BeaconManager(this);
-
-   beaconManager.setRange(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM);
-   beaconManager.setFrequency(AdvertiseSettings.ADVERTISE_MODE_BALANCED);
+   
+   beaconManager.setRange(RANGE_OPTION);
+   beaconManager.setFrequency(FREQ_OPTION);
 
    beaconManager.start().subscribe(
       status -> {
@@ -61,10 +74,7 @@ Add the dependency
             //Failed to start advertising
          }
       }
-   );
 ```
-
-#### Beacon Manager
 
 ##### Frequency Options
 
