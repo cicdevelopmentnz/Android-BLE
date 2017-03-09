@@ -18,12 +18,16 @@ import java.util.*
  */
 
 class BeaconManager(private val c: Context) {
-
     private val manager: BluetoothManager
     private val adapter: BluetoothAdapter
     private var advertiser: BluetoothLeAdvertiser? = null
 
     private val backend: BeaconBackend
+
+
+
+    private var range: Int? = AdvertiseSettings.ADVERTISE_TX_POWER_LOW
+    private var frequency: Int? = AdvertiseSettings.ADVERTISE_MODE_BALANCED
 
     private var advertiseCallback: AdvertiseCallback? = null
 
@@ -42,6 +46,14 @@ class BeaconManager(private val c: Context) {
 
     fun removeBeacon(b: Beacon) {
         this.backend.removeBeacon(b)
+    }
+
+    fun setRange(range: Int){
+        this.range = range
+    }
+
+    fun setFrequency(frequency: Int){
+        this.frequency = frequency
     }
 
     fun start(): Flowable<Boolean>{
@@ -80,7 +92,7 @@ class BeaconManager(private val c: Context) {
     }
 
     private fun voidSettings(): AdvertiseSettings {
-        return AdvertiseSettings.Builder().setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED).setConnectable(true).setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM).build()
+        return AdvertiseSettings.Builder().setAdvertiseMode(this.frequency!!).setConnectable(true).setTxPowerLevel(this.range!!).build()
     }
 
     private fun voidData(): AdvertiseData {

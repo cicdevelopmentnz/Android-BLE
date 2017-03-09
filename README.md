@@ -49,6 +49,10 @@ Add the dependency
    Beacon beacon = new Beacon("Gateway-Node", messages);
 
    BeaconManager beaconManager = new BeaconManager(this);
+
+   beaconManager.setRange(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM);
+   beaconManager.setFrequency(AdvertiseSettings.ADVERTISE_MODE_BALANCED);
+
    beaconManager.start().subscribe(
       status -> {
          if(status){
@@ -59,6 +63,30 @@ Add the dependency
       }
    );
 ```
+
+#### Beacon Manager
+
+##### Frequency Options
+
+Default: AdvertiseSettings.ADVERTISE_MODE_BALANCED
+
+| Name                                         |
+| -------------------------------------------- |
+| AdvertiseSettings.ADVERTISE_MODE_LOW_POWER   |
+| AdvertiseSettings.ADVERTISE_MODE_BALANCED    |
+| AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY |
+
+##### Range Options
+
+Default: AdvertiseSettings.ADVERTISE_TX_POWER_LOW
+
+| Name                                           |
+| ---------------------------------------------- |
+| AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW |
+| AdvertiseSettings.ADVERTISE_TX_POWER_LOW       |
+| AvdertiseSettings.ADVERTISE_TX_POWER_MEDIUM    |
+| AdvertiseSettings.ADVERTISE_TX_POWER_HIGH      |
+
 
 ### Scanner (Central/Discovery)
 
