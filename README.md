@@ -16,7 +16,7 @@ Add the following to your root build.gradle
 Add the dependency
 ```gradle
    dependencies {
-      compile 'com.github.cicdevelopmentnz:Android-BLE:v0.0.3'
+      compile 'com.github.cicdevelopmentnz:Android-BLE:v0.0.4'
    }
 ```
 
