@@ -1,9 +1,6 @@
 package nz.co.cic.ble.scanner
 
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
-import com.beust.klaxon.array
-import com.beust.klaxon.string
+import com.beust.klaxon.*
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import org.json.JSONObject
@@ -16,15 +13,17 @@ import java.util.*
 class ScanFilter(val name: String, val messageKeys: Array<String>){
 
     private var uuid: UUID? = null
-    private var messageUuids: Array<UUID>? = null
+    private var messageUuids: Map<UUID, String>? = null
     private val parser: Parser = Parser()
 
     init {
         this.uuid = UUID.nameUUIDFromBytes(name.toByteArray())
-        this.messageUuids = Array(messageKeys.size,{
-                ix ->
-                UUID.nameUUIDFromBytes(messageKeys.get(ix).toByteArray())
-        })
+
+        this.messageUuids = this.messageKeys.associateBy {
+            keySelector ->
+
+            UUID.nameUUIDFromBytes(keySelector.toByteArray())
+        }
     }
 
     fun filter(radioFlow: Flowable<JSONObject>): Flowable<JsonObject>{
@@ -34,16 +33,8 @@ class ScanFilter(val name: String, val messageKeys: Array<String>){
                 jsonInfo ->
 
                 var json = parser.parse(StringBuilder(jsonInfo.toString())) as JsonObject
-
-                var prefiltered = json.array<JsonObject>("messages")
-                //Save the lungs
-                var filtered = prefiltered?.filter {
-                    it.string("id") == this.uuid.toString()
-                }
-
-                json.set("messages", filtered)
-
-                subscriber.onNext(json)
+                
+                subscriber.onNext(runFilter(json))
 
             }, {
                 err ->
@@ -52,6 +43,32 @@ class ScanFilter(val name: String, val messageKeys: Array<String>){
                 subscriber.onComplete()
             })
         }, BackpressureStrategy.BUFFER)
+    }
+
+    private fun runFilter(json: JsonObject): JsonObject{
+        var filtered = getServiceById(json)
+        filtered?.set("id", this.name)
+        filtered?.set("messages", nameMessages(filtered?.array<JsonObject>("messages")))
+        return filtered!!
+    }
+
+    private fun nameMessages(json: JsonArray<JsonObject>?): JsonArray<JsonObject>?{
+        var it = json?.iterator()
+        while(it!!.hasNext()){
+            var message = it.next()
+            var id = UUID.fromString(message.get("id") as String)
+            var name = this.messageUuids?.get(id)
+            message.set("id", name)
+        }
+        return json
+    }
+
+    private fun getServiceById(json: JsonObject): JsonObject? {
+        var prefiltered = json.array<JsonObject>("messages")
+        var filtered = prefiltered?.filter {
+            it.string("id") == this.uuid.toString()
+        }
+        return filtered?.get(0)
     }
 
 
