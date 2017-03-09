@@ -109,7 +109,7 @@ Default: AdvertiseSettings.ADVERTISE_TX_POWER_LOW
       }
    );
 
-   scanner.start("Identifier", new String[]{"Key"}).subscribe(
+   scanner.startFiltered("Gateway-Node", new String[]{"Gateway-Id", "Gateway-Key"}).subscribe(
       filteredInfo -> {
          //JsonObject containing filtered information
       }
