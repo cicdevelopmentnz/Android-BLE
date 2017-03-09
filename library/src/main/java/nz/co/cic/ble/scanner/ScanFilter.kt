@@ -33,8 +33,10 @@ class ScanFilter(val name: String, val messageKeys: Array<String>){
                 jsonInfo ->
 
                 var json = parser.parse(StringBuilder(jsonInfo.toString())) as JsonObject
-                
-                subscriber.onNext(runFilter(json))
+
+                var filteredReturn = runFilter(json)
+                filteredReturn.set("deviceAddress", json.get("deviceAddress"))
+                subscriber.onNext(filteredReturn)
 
             }, {
                 err ->

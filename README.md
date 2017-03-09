@@ -22,13 +22,31 @@ Add the dependency
 
 ## Usage
 
+### Example Advertisement
+
+```javascript
+
+{
+   "id": "Gateway-Node",
+   "messages": [{
+      "id": "Gateway-Id",
+      "value": "UxayxL"
+   }, {
+      "id": "Gateway-Key",
+      "value": "UDP-123"
+   }]
+}
+
+```
+
 ### Beacon
 
 ```java
    HashMap messages = new HashMap<String, String>();
-   messages.put("Key", "Value");
+   messages.put("Gateway-Id", "UxayxL");
+   messages.put("Gateway-Key", "UDP-123");
    
-   Beacon beacon = new Beacon("Identifier", messages);
+   Beacon beacon = new Beacon("Gateway-Node", messages);
 
    BeaconManager beaconManager = new BeaconManager(this);
    beaconManager.start().subscribe(
@@ -49,8 +67,14 @@ Add the dependency
    Scanner scanner = new Scanner(this);
    scanner.start().subscribe(
       jsonInfo -> {
-         //JSON object containing advertised information per device
+         //JSONObject containing raw advertised information
       }
-   ); 
+   );
+
+   scanner.start("Identifier", new String[]{"Key"}).subscribe(
+      filteredInfo -> {
+         //JsonObject containing filtered information
+      }
+   );
 ```
 
