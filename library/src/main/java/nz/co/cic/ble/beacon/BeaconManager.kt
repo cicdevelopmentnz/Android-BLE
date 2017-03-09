@@ -11,8 +11,6 @@ import android.os.ParcelUuid
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import nz.co.cic.ble.R
-import org.jdeferred.Deferred
-import java.nio.charset.Charset
 import java.util.*
 
 /**

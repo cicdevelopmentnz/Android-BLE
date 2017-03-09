@@ -1,17 +1,9 @@
 package nz.co.cic.ble.scanner
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.le.BluetoothLeScanner
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
+
 import android.content.Context
-import android.os.Build
-import android.widget.Toast
+import com.beust.klaxon.JsonObject
 import io.reactivex.Flowable
-
-
 import org.json.JSONObject
 
 /**
@@ -30,6 +22,11 @@ class Scanner(private val c: Context) {
 
     fun start(): Flowable<JSONObject> {
         return this.radio!!.start()
+    }
+
+    fun startFiltered(name: String, keys: Array<String>): Flowable<JsonObject>{
+        var filter = ScanFilter(name, keys)
+        return filter.filter(this.radio!!.start())
     }
 
     fun stop() {

@@ -5,15 +5,11 @@ import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
-import android.support.v4.app.ActivityCompat
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
-import org.json.JSONArray
 import org.json.JSONObject
-import java.util.jar.Manifest
 
 /**
  * Created by dipshit on 4/03/17.

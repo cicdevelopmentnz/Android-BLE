@@ -2,16 +2,10 @@ package nz.co.cic.ble.beacon
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import org.json.JSONArray
 import org.json.JSONObject
-
-import java.util.ArrayList
-import java.util.HashMap
+import java.util.*
 import java.util.Map
-import java.util.UUID
 
 /**
  * Created by dipshit on 3/03/17.

@@ -1,16 +1,8 @@
 package nz.co.cic.ble.beacon
 
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
-import android.bluetooth.BluetoothGattServer
-import android.bluetooth.BluetoothGattServerCallback
-import android.bluetooth.BluetoothGattService
-import android.bluetooth.BluetoothManager
+import android.bluetooth.*
 import android.content.Context
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by dipshit on 3/03/17.
