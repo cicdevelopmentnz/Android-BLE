@@ -46,7 +46,7 @@ Add the dependency
 with Map
 
 ```java
-   HashMap messages = new HashMap<String, String>();
+   Map messages = new HashMap<String, String>();
    messages.put("Gateway-Id", "UxayxL");
    messages.put("Gateway-Key", "UDP-123");   
    Beacon beacon = new Beacon("Gateway-Node", messages);
