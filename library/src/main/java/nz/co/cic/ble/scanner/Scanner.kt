@@ -11,10 +11,7 @@ import android.os.Build
 import android.widget.Toast
 import io.reactivex.Flowable
 
-import org.jdeferred.Deferred
-import org.jdeferred.FailCallback
-import org.jdeferred.Promise
-import org.jdeferred.impl.DeferredObject
+
 import org.json.JSONObject
 
 /**
