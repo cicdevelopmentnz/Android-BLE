@@ -10,7 +10,7 @@ import java.util.*
  * Created by dipshit on 10/03/17.
  */
 
-class ScanFilter(val name: String, val messageKeys: Array<String>){
+class ScanFilter(val name: String, val messageKeys: Array<String>) {
 
     private var uuid: UUID? = null
     private var messageUuids: Map<UUID, String>? = null
@@ -26,10 +26,10 @@ class ScanFilter(val name: String, val messageKeys: Array<String>){
         }
     }
 
-    fun filter(radioFlow: Flowable<JSONObject>): Flowable<JsonObject>{
+    fun filter(radioFlow: Flowable<JSONObject>?): Flowable<JsonObject> {
         return Flowable.create({
             subscriber ->
-            radioFlow.subscribe({
+            radioFlow?.subscribe({
                 jsonInfo ->
 
                 var json = parser.parse(StringBuilder(jsonInfo.toString())) as JsonObject
@@ -47,16 +47,16 @@ class ScanFilter(val name: String, val messageKeys: Array<String>){
         }, BackpressureStrategy.BUFFER)
     }
 
-    private fun runFilter(json: JsonObject): JsonObject{
+    private fun runFilter(json: JsonObject): JsonObject {
         var filtered = getServiceById(json)
         filtered?.set("id", this.name)
         filtered?.set("messages", nameMessages(filtered?.array<JsonObject>("messages")))
         return filtered!!
     }
 
-    private fun nameMessages(json: JsonArray<JsonObject>?): JsonArray<JsonObject>?{
+    private fun nameMessages(json: JsonArray<JsonObject>?): JsonArray<JsonObject>? {
         var it = json?.iterator()
-        while(it!!.hasNext()){
+        while (it!!.hasNext()) {
             var message = it.next()
             var id = UUID.fromString(message.get("id") as String)
             var name = this.messageUuids?.get(id)
@@ -72,7 +72,6 @@ class ScanFilter(val name: String, val messageKeys: Array<String>){
         }
         return filtered?.get(0)
     }
-
 
 
 }

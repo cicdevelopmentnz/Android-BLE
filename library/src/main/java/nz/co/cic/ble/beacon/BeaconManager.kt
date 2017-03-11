@@ -25,7 +25,6 @@ class BeaconManager(private val c: Context) {
     private val backend: BeaconBackend
 
 
-
     private var range: Int? = AdvertiseSettings.ADVERTISE_TX_POWER_LOW
     private var frequency: Int? = AdvertiseSettings.ADVERTISE_MODE_BALANCED
 
@@ -48,42 +47,42 @@ class BeaconManager(private val c: Context) {
         this.backend.removeBeacon(b)
     }
 
-    fun setRange(range: Int){
+    fun setRange(range: Int) {
         this.range = range
     }
 
-    fun setFrequency(frequency: Int){
+    fun setFrequency(frequency: Int) {
         this.frequency = frequency
     }
 
-    fun start(): Flowable<Boolean>{
+    fun start(): Flowable<Boolean> {
 
-            if (this.advertiser == null) {
-                this.advertiser = getAdvertiser()
-                println("Supports advertising: " + this.adapter.isMultipleAdvertisementSupported)
-            }
+        if (this.advertiser == null) {
+            this.advertiser = getAdvertiser()
+            println("Supports advertising: " + this.adapter.isMultipleAdvertisementSupported)
+        }
 
-            return Flowable.create({
-                subscriber ->
-                this.advertiseCallback = object : AdvertiseCallback() {
-                    override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
-                        super.onStartSuccess(settingsInEffect)
-                        subscriber.onNext(true)
-                    }
-
-                    override fun onStartFailure(errorCode: Int) {
-                        super.onStartFailure(errorCode)
-                        println("Error: " + errorCode)
-                        subscriber.onNext(false)
-                    }
+        return Flowable.create({
+            subscriber ->
+            this.advertiseCallback = object : AdvertiseCallback() {
+                override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
+                    super.onStartSuccess(settingsInEffect)
+                    subscriber.onNext(true)
                 }
-                this.advertiser!!.startAdvertising(voidSettings(), voidData(), this.advertiseCallback)
-            }, BackpressureStrategy.BUFFER)
+
+                override fun onStartFailure(errorCode: Int) {
+                    super.onStartFailure(errorCode)
+                    println("Error: " + errorCode)
+                    subscriber.onNext(false)
+                }
+            }
+            this.advertiser?.startAdvertising(voidSettings(), voidData(), this.advertiseCallback)
+        }, BackpressureStrategy.BUFFER)
     }
 
     fun stop() {
         if (this.advertiser != null) {
-            this.advertiser!!.stopAdvertising(advertiseCallback)
+            this.advertiser?.stopAdvertising(advertiseCallback)
         }
     }
 

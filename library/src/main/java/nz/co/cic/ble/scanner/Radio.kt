@@ -15,7 +15,7 @@ import org.json.JSONObject
  * Created by dipshit on 4/03/17.
  */
 
-class Radio(private val c: Context) : BluetoothGattCallback(){
+class Radio(private val c: Context) : BluetoothGattCallback() {
 
     private val manager: BluetoothManager
     private val adapter: BluetoothAdapter
@@ -33,42 +33,43 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
 
     }
 
-    fun start() : Flowable<JSONObject> {
+    fun start(): Flowable<JSONObject> {
         return Flowable.create({
             subscriber ->
 
-            this.scanDevices()!!.subscribe(RadioDeviceProcessor(c, subscriber))
+            this.scanDevices()?.subscribe(RadioDeviceProcessor(c, subscriber))
 
         }, BackpressureStrategy.BUFFER)
 
     }
 
-    fun stop(){
+    fun stop() {
         compatStop()
     }
 
-    fun resolve(device: BluetoothDevice){
+    fun resolve(device: BluetoothDevice) {
         var gatt = device.connectGatt(c, false, this)
     }
 
-    fun enable(){
-        if(!this.adapter.isEnabled){
+    fun enable() {
+        if (!this.adapter.isEnabled) {
             this.adapter.enable()
         }
     }
 
-    fun scanDevices() : Flowable<BluetoothDevice>?{
+    fun scanDevices(): Flowable<BluetoothDevice>? {
         return Flowable.create<BluetoothDevice>({
             subscriber ->
             compatStart(subscriber)
         }, BackpressureStrategy.BUFFER)
     }
-    private fun compatStart(observable: FlowableEmitter<BluetoothDevice>){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            if(this.scanner == null){
+
+    private fun compatStart(observable: FlowableEmitter<BluetoothDevice>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (this.scanner == null) {
                 this.scanner = this.adapter.bluetoothLeScanner
             }
-            this.scanCallback = object: ScanCallback(){
+            this.scanCallback = object : ScanCallback() {
                 override fun onScanResult(callbackType: Int, result: ScanResult?) {
                     super.onScanResult(callbackType, result)
                     observable.onNext(result?.device)
@@ -76,17 +77,17 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
 
                 override fun onBatchScanResults(results: MutableList<ScanResult>?) {
                     super.onBatchScanResults(results)
-                    val it = results!!.iterator()
-                    while(it.hasNext()){
+                    val it = results?.iterator()
+                    while (it!!.hasNext()) {
                         var sr = it.next()
                         observable.onNext(sr.device)
                     }
                 }
             }
 
-            this.scanner!!.startScan(this.scanCallback)
-        }else{
-            this.legacyCallback = object: BluetoothAdapter.LeScanCallback {
+            this.scanner?.startScan(this.scanCallback)
+        } else {
+            this.legacyCallback = object : BluetoothAdapter.LeScanCallback {
                 override fun onLeScan(device: BluetoothDevice?, rssi: Int, scanRecord: ByteArray?) {
                     observable.onNext(device)
                 }
@@ -96,17 +97,17 @@ class Radio(private val c: Context) : BluetoothGattCallback(){
         }
     }
 
-    private fun compatStop(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            this.scanner!!.stopScan(this.scanCallback)
-        }else{
+    private fun compatStop() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            this.scanner?.stopScan(this.scanCallback)
+        } else {
             this.adapter.stopLeScan(this.legacyCallback)
         }
     }
 
 
     //Bluetooth Gatt Callbacks
-    override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int){
+    override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
 
     }

@@ -9,7 +9,7 @@ import org.json.JSONObject
  * Created by dipshit on 5/03/17.
  */
 
-data class RadioService(val service: BluetoothGattService){
+data class RadioService(val service: BluetoothGattService) {
 
     var serviceId: String? = null
     var messages: MutableList<RadioMessage>? = null
@@ -19,17 +19,16 @@ data class RadioService(val service: BluetoothGattService){
         this.messages = mutableListOf()
     }
 
-    fun addMessage(char: BluetoothGattCharacteristic){
-        this.messages!!.add(RadioMessage(char))
+    fun addMessage(char: BluetoothGattCharacteristic) {
+        this.messages?.add(RadioMessage(char))
     }
 
-    fun toJSON(): JSONObject{
-        var serviceObject =JSONObject()
+    fun toJSON(): JSONObject {
+        var serviceObject = JSONObject()
         serviceObject.put("id", serviceId)
 
         var messageObject = JSONArray()
-        messages!!.forEach {
-            it ->
+        messages?.forEach {
             messageObject.put(it.toJSON())
         }
         serviceObject.put("messages", messageObject)
@@ -38,19 +37,19 @@ data class RadioService(val service: BluetoothGattService){
     }
 }
 
-data class RadioMessage(val characteristic: BluetoothGattCharacteristic){
+data class RadioMessage(val characteristic: BluetoothGattCharacteristic) {
 
     var messageId: String? = null
     var message: String? = null
 
-    init{
+    init {
         this.messageId = characteristic.uuid.toString()
-        if(characteristic.value != null) {
+        if (characteristic.value != null) {
             this.message = String(characteristic.value)
         }
     }
 
-    fun toJSON(): JSONObject{
+    fun toJSON(): JSONObject {
         var messageObject = JSONObject()
         messageObject.put("id", messageId)
         messageObject.put("value", message)

@@ -15,7 +15,7 @@ import org.json.JSONObject
  * Created by dipshit on 5/03/17.
  */
 
-class RadioDeviceProcessor(private val mContext: Context, private val emitter: FlowableEmitter<JSONObject>): ResourceSubscriber<BluetoothDevice>() {
+class RadioDeviceProcessor(private val mContext: Context, private val emitter: FlowableEmitter<JSONObject>) : ResourceSubscriber<BluetoothDevice>() {
     override fun onStart() {
         request(1)
     }
@@ -30,25 +30,25 @@ class RadioDeviceProcessor(private val mContext: Context, private val emitter: F
         this.processDevice(t)
     }
 
-    private fun processDevice(btDevice: BluetoothDevice?){
+    private fun processDevice(btDevice: BluetoothDevice?) {
         var device = RadioDevice(mContext, btDevice!!)
-        device.discover()!!.subscribe({
+        device.discover()?.subscribe({
             services ->
 
             emitter.onNext(joinToJSON(device, services))
             device.disconnect()
         })
 
-        device.connect()!!.subscribe({
+        device.connect()?.subscribe({
             state ->
 
-            if(!state){
+            if (!state) {
                 request(1)
             }
         })
     }
 
-    private fun joinToJSON(device: RadioDevice, services : List<RadioService> ) : JSONObject{
+    private fun joinToJSON(device: RadioDevice, services: List<RadioService>): JSONObject {
         var obj = JSONObject()
         obj.put("deviceAddress", device.device.address)
 
@@ -65,12 +65,12 @@ class RadioDeviceProcessor(private val mContext: Context, private val emitter: F
 
 }
 
-class RadioServiceProcessor(val services: List<BluetoothGattService>){
+class RadioServiceProcessor(val services: List<BluetoothGattService>) {
 
     private var observableEmitter: FlowableEmitter<BluetoothGattService>? = null
     private var ix: Int = -1
 
-    fun queue(): Flowable<BluetoothGattService>{
+    fun queue(): Flowable<BluetoothGattService> {
         return Flowable.create({
             subscriber ->
             this.observableEmitter = subscriber
@@ -78,27 +78,27 @@ class RadioServiceProcessor(val services: List<BluetoothGattService>){
         }, BackpressureStrategy.BUFFER)
     }
 
-    fun next(){
+    fun next() {
         ix += 1
-        if(ix < services.size){
-            this.observableEmitter!!.onNext(services.get(ix))
-        }else{
-            this.observableEmitter!!.onComplete()
+        if (ix < services.size) {
+            this.observableEmitter?.onNext(services.get(ix))
+        } else {
+            this.observableEmitter?.onComplete()
         }
     }
 }
 
-class RadioCharacteristicProcessor(val service: BluetoothGattService){
+class RadioCharacteristicProcessor(val service: BluetoothGattService) {
 
 
     private var observableEmitter: FlowableEmitter<BluetoothGattCharacteristic>? = null
-    private var ix : Int = -1
+    private var ix: Int = -1
 
     init {
 
     }
 
-    fun queue() : Flowable<BluetoothGattCharacteristic>{
+    fun queue(): Flowable<BluetoothGattCharacteristic> {
         return Flowable.create({
             subscriber ->
             this.observableEmitter = subscriber
@@ -106,12 +106,12 @@ class RadioCharacteristicProcessor(val service: BluetoothGattService){
         }, BackpressureStrategy.BUFFER)
     }
 
-    fun next(){
+    fun next() {
         ix += 1
-        if(ix < service.characteristics.size) {
-            this.observableEmitter!!.onNext(service.characteristics.get(ix))
-        }else{
-            this.observableEmitter!!.onComplete()
+        if (ix < service.characteristics.size) {
+            this.observableEmitter?.onNext(service.characteristics.get(ix))
+        } else {
+            this.observableEmitter?.onComplete()
         }
     }
 }

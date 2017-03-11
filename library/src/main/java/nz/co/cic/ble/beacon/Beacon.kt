@@ -16,7 +16,7 @@ import kotlin.collections.HashMap
 class Beacon {
 
     private var name: String? = null
-    private var messages: Map<String, String>? = null
+    private var messages: HashMap<String, String>? = null
 
     private var uuid: UUID? = null
     private var hashedValues: HashMap<UUID, String>? = null
@@ -27,30 +27,28 @@ class Beacon {
 
     }
 
-    constructor(name: String, messages: Map<String, String>){
+    constructor(name: String, messages: HashMap<String, String>) {
         this.name = name
         this.messages = messages
     }
 
-    constructor(json: JsonObject){
+    constructor(json: JsonObject) {
         this.name = json.get("id") as String
         this.messages = HashMap<String, String>()
         var messages = json.array<JsonObject>("messages")
         messages?.forEach {
-            x ->
-
-            this.messages!!.plus(Pair(x.get("id") as String, x.get("value") as String))
+            this.messages?.put(it.get("id") as String, it.get("value") as String)
         }
     }
 
     fun initPrivate() {
-        this.uuid = UUID.nameUUIDFromBytes(name!!.toByteArray())
+        this.uuid = UUID.nameUUIDFromBytes(name?.toByteArray())
 
         this.hashedValues = HashMap<UUID, String>()
-        val it = messages!!.entries.iterator()
-        while (it.hasNext()) {
+        val it = messages?.entries?.iterator()
+        while (it!!.hasNext()) {
             val pair = it.next() as Map.Entry<String, String>
-            hashedValues!!.put(UUID.nameUUIDFromBytes(pair.key.toString().toByteArray()), pair.value.toString())
+            hashedValues?.put(UUID.nameUUIDFromBytes(pair.key.toString().toByteArray()), pair.value.toString())
         }
     }
 
@@ -70,8 +68,8 @@ class Beacon {
         get() {
             val characteristics = ArrayList<BluetoothGattCharacteristic>()
 
-            val it = hashedValues!!.entries.iterator()
-            while (it.hasNext()) {
+            val it = hashedValues?.entries?.iterator()
+            while (it!!.hasNext()) {
                 val pair = it.next() as Map.Entry<UUID, String>
                 val characteristic = BluetoothGattCharacteristic(pair.key, BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ)
                 characteristic.setValue(pair.value.toString().toByteArray())

@@ -17,21 +17,21 @@ class Scanner(private val c: Context) {
 
     init {
         this.radio = Radio(c)
-        this.radio!!.enable()
+        this.radio?.enable()
     }
 
-    fun start(): Flowable<JSONObject> {
-        return this.radio!!.start()
+    fun start(): Flowable<JSONObject>? {
+        return this.radio?.start()
     }
 
-    fun startFiltered(name: String, keys: Array<String>): Flowable<JsonObject>{
+    fun startFiltered(name: String, keys: Array<String>): Flowable<JsonObject>? {
         var filter = ScanFilter(name, keys)
-        return filter.filter(this.radio!!.start())
+        return filter.filter(this.radio?.start())
     }
 
     fun stop() {
-        if(this.radio != null){
-            this.radio!!.stop()
+        if (this.radio != null) {
+            this.radio?.stop()
         }
     }
 
