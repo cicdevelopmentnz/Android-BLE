@@ -50,7 +50,7 @@ class ScanFilter(val name: String, val messageKeys: Array<String>) {
     private fun runFilter(json: JsonObject): JsonObject {
         var filtered = getServiceById(json)
         filtered?.set("id", this.name)
-        filtered?.set("messages", nameMessages(filtered?.array<JsonObject>("messages")))
+        filtered?.set("messages", nameMessages(filtered.array<JsonObject>("messages")))
         return filtered!!
     }
 

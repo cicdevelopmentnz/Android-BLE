@@ -28,12 +28,14 @@ class Beacon {
     }
 
     constructor(name: String, messages: HashMap<String, String>) {
+        println("Beacon constructed with name: " + name)
         this.name = name
         this.messages = messages
     }
 
-    constructor(json: JsonObject) {
+    constructor(json: JsonObject){
         this.name = json.get("id") as String
+        println("BEacon constructed with name: " + name)
         this.messages = HashMap<String, String>()
         var messages = json.array<JsonObject>("messages")
         messages?.forEach {
@@ -47,7 +49,7 @@ class Beacon {
         this.hashedValues = HashMap<UUID, String>()
         val it = messages?.entries?.iterator()
         while (it!!.hasNext()) {
-            val pair = it.next() as Map.Entry<String, String>
+            val pair = it.next()
             hashedValues?.put(UUID.nameUUIDFromBytes(pair.key.toString().toByteArray()), pair.value.toString())
         }
     }
@@ -70,7 +72,7 @@ class Beacon {
 
             val it = hashedValues?.entries?.iterator()
             while (it!!.hasNext()) {
-                val pair = it.next() as Map.Entry<UUID, String>
+                val pair = it.next()
                 val characteristic = BluetoothGattCharacteristic(pair.key, BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ)
                 characteristic.setValue(pair.value.toString().toByteArray())
                 characteristics.add(characteristic)

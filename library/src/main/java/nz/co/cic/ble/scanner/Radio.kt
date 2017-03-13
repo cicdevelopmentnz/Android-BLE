@@ -47,9 +47,6 @@ class Radio(private val c: Context) : BluetoothGattCallback() {
         compatStop()
     }
 
-    fun resolve(device: BluetoothDevice) {
-        var gatt = device.connectGatt(c, false, this)
-    }
 
     fun enable() {
         if (!this.adapter.isEnabled) {
