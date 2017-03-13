@@ -13,10 +13,7 @@ import kotlin.collections.HashMap
  * Created by dipshit on 3/03/17.
  */
 
-class Beacon {
-
-    private var name: String? = null
-    private var messages: HashMap<String, String>? = null
+class Beacon(private val name: String, private val messages: HashMap<String, String>){
 
     private var uuid: UUID? = null
     private var hashedValues: HashMap<UUID, String>? = null
@@ -25,22 +22,6 @@ class Beacon {
 
         this.initPrivate()
 
-    }
-
-    constructor(name: String, messages: HashMap<String, String>) {
-        println("Beacon constructed with name: " + name)
-        this.name = name
-        this.messages = messages
-    }
-
-    constructor(json: JsonObject){
-        this.name = json.get("id") as String
-        println("BEacon constructed with name: " + name)
-        this.messages = HashMap<String, String>()
-        var messages = json.array<JsonObject>("messages")
-        messages?.forEach {
-            this.messages?.put(it.get("id") as String, it.get("value") as String)
-        }
     }
 
     fun initPrivate() {
